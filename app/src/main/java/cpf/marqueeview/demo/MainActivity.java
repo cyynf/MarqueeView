@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MarqueeView marqueeView = findViewById(R.id.marquee_view);
+        final MarqueeView marqueeView = findViewById(R.id.marquee_view);
         marqueeView.setOnItemClickListener(new MarqueeView.OnItemClickListener() {
             @Override
             public void onClick(int position) {

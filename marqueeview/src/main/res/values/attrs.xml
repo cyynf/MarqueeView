@@ -7,7 +7,7 @@
         <!-- string-array in an XML tag -->
         <attr name="entries" format="reference" />
 
-        <!-- Horizontal only, The initial offset relative to the view width -->
+        <!-- The initial offset relative to the view width -->
         <attr name="offset" format="float" />
 
         <!-- The scrolling speed -->
@@ -17,7 +17,7 @@
             <enum name="fast" value="4" />
         </attr>
 
-        <!-- Horizontal only, Repeat the number -->
+        <!-- Repeat the number -->
         <attr name="marqueeRepeatLimit" format="integer">
             <enum name="marquee_forever" value="-1" />
         </attr>

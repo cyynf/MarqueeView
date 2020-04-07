@@ -17,11 +17,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.Px;
 
 /**
  * Author: cpf
  * Date: 2020/4/7
  * Email: cpf4263@gmail.com
+ * <p>
+ * Scrolling marquee
  */
 public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -32,17 +35,28 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     private float textSize;
 
-    @ColorInt
-    private int textColor;
+    private  int textColor;
 
+    /**
+     * Scrolling speed
+     */
     private float speed;
 
+    /**
+     * Number of rolling repeats
+     */
     private int marqueeRepeatLimit;
 
+    /**
+     * The content is initially displayed relative to the view width offset
+     */
     private float offset;
 
     private boolean fadingEdge;
 
+    /**
+     * The currently displayed Marquee
+     */
     private int position;
 
     private String[] entries;
@@ -59,16 +73,18 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         return textSize;
     }
 
-    public void setTextSize(float textSize) {
+    public void setTextSize(@Px float textSize) {
         this.textSize = textSize;
+        paint.setTextSize(textSize);
     }
 
     public int getTextColor() {
         return textColor;
     }
 
-    public void setTextColor(int textColor) {
+    public void setTextColor(@ColorInt int textColor) {
         this.textColor = textColor;
+        paint.setColor(textColor);
     }
 
     public float getSpeed() {
@@ -151,11 +167,13 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
                 MarqueeView.MarqueeForever
         );
         CharSequence[] array = arr.getTextArray(R.styleable.MarqueeView_entries);
-        entries = new String[array.length];
-        for (int i = 0; i < array.length; i++) {
-            entries[i] = array[i].toString();
+        if (array != null && array.length > 0) {
+            entries = new String[array.length];
+            for (int i = 0; i < array.length; i++) {
+                entries[i] = array[i].toString();
+            }
         }
-        offset = arr.getFloat(R.styleable.MarqueeView_offset, 0.5f);
+        offset = arr.getFloat(R.styleable.MarqueeView_offset, 1f);
         fadingEdge = arr.getBoolean(R.styleable.MarqueeView_fadingEdge, true);
         arr.recycle();
         init(false);
@@ -190,7 +208,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        isRunning = false;
+        stop();
     }
 
     @Override
@@ -211,7 +229,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             textColor = Color.WHITE;
             speed = Middle;
             marqueeRepeatLimit = MarqueeView.MarqueeForever;
-            offset = 0.5f;
+            offset = 1f;
             fadingEdge = true;
         }
         paint = new Paint();
@@ -313,7 +331,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
                 float textWidth = textWidthArray[position];
                 if (x < 0 - textWidth) {
                     x = mWidth;
-                    if (++position == entries.length) {
+                    if (++position >= entries.length) {
                         position = 0;
                         if (marqueeRepeatLimit != MarqueeForever && --repeatCount < 0) {
                             position = -1;

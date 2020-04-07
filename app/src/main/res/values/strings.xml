@@ -2,7 +2,7 @@
     <string name="app_name">app</string>
 
     <string-array name="data">
-        <item>天生我才必有用,千金散尽还复来</item>
+        <item>天生我才必有用，千金散尽还复来</item>
         <item>长风破浪会有时，直挂云帆济沧海</item>
     </string-array>
 </resources>
