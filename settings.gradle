@@ -1,0 +1,3 @@
+rootProject.name='MarqueeView'
+include ':marqueeview'
+include ':app'

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MarqueeView">
+        <attr name="textSize" format="dimension" />
+        <attr name="textColor" format="color" />
+
+        <!-- string-array in an XML tag -->
+        <attr name="entries" format="reference" />
+
+        <!-- Horizontal only, The initial offset relative to the view width -->
+        <attr name="offset" format="float" />
+
+        <!-- The scrolling speed -->
+        <attr name="speed" format="float">
+            <enum name="slow" value="2" />
+            <enum name="middle" value="3" />
+            <enum name="fast" value="4" />
+        </attr>
+
+        <!-- Horizontal only, Repeat the number -->
+        <attr name="marqueeRepeatLimit" format="integer">
+            <enum name="marquee_forever" value="-1" />
+        </attr>
+
+        <attr name="fadingEdge" format="boolean" />
+
+    </declare-styleable>
+</resources>

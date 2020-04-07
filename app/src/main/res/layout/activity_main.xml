@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <cpf.marqueeview.MarqueeView
+        android:id="@+id/marquee_view"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@android:color/black"
+        app:entries="@array/data"
+        app:fadingEdge="true"
+        app:marqueeRepeatLimit="marquee_forever"
+        app:offset="1"
+        app:speed="slow"
+        app:textColor="@android:color/white"
+        app:textSize="16sp" />
+
+</LinearLayout>
