@@ -2,11 +2,11 @@
 Scrolling marquee
 
 ## Features:
-- Supports setting multiple subtitle loops to scroll
+- Supports multiple Marquee loops to scroll
 - Use the SurfaceView for better performance
 - Support to set the number of repeats
 - Support FadingEdge
-- Supports setting initial offset ratio
+- Supports set initial offset ratio
 
 ## Usage
 ``` xml
