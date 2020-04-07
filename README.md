@@ -1,7 +1,7 @@
 # MarqueeView
 Scrolling marquee
 
-## Features:
+## Features
 - Supports multiple Marquee loops to scroll
 - Use the SurfaceView for better performance
 - Support to set the number of repeats
