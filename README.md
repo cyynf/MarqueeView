@@ -8,6 +8,8 @@ Scrolling marquee
 - Support FadingEdge
 - Supports set initial offset ratio
 
+![image](https://github.com/cyynf/MarqueeView/blob/master/image.gif)
+
 ## Usage
 ``` xml
 <cpf.marqueeview.MarqueeView
