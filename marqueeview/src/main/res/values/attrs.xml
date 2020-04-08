@@ -1,28 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <attr name="textSize" format="dimension" />
+    <attr name="textColor" format="color" />
+
+    <!-- string-array in an XML tag -->
+    <attr name="entries" format="reference" />
+
+    <!-- The initial offset relative to the view width -->
+    <attr name="offset" format="float" />
+
+    <!-- The scrolling speed -->
+    <attr name="speed" format="float">
+        <enum name="slow" value="2" />
+        <enum name="middle" value="3" />
+        <enum name="fast" value="4" />
+    </attr>
+
+    <!-- Repeat the number -->
+    <attr name="marqueeRepeatLimit" format="integer">
+        <enum name="marquee_forever" value="-1" />
+    </attr>
+
+    <attr name="fadingEdge" format="boolean" />
+
+    <attr name="backgroundColor" format="color" />
+
     <declare-styleable name="MarqueeView">
-        <attr name="textSize" format="dimension" />
-        <attr name="textColor" format="color" />
+        <attr name="textSize" />
+        <attr name="textColor" />
 
         <!-- string-array in an XML tag -->
-        <attr name="entries" format="reference" />
+        <attr name="entries" />
 
         <!-- The initial offset relative to the view width -->
-        <attr name="offset" format="float" />
+        <attr name="offset" />
 
         <!-- The scrolling speed -->
-        <attr name="speed" format="float">
-            <enum name="slow" value="2" />
-            <enum name="middle" value="3" />
-            <enum name="fast" value="4" />
-        </attr>
+        <attr name="speed" />
 
         <!-- Repeat the number -->
-        <attr name="marqueeRepeatLimit" format="integer">
-            <enum name="marquee_forever" value="-1" />
-        </attr>
+        <attr name="marqueeRepeatLimit" />
 
-        <attr name="fadingEdge" format="boolean" />
+        <attr name="fadingEdge" />
 
+        <attr name="backgroundColor" />
+    </declare-styleable>
+
+    <declare-styleable name="MarqueeTextureView">
+        <attr name="textSize" />
+        <attr name="textColor" />
+
+        <!-- string-array in an XML tag -->
+        <attr name="entries" />
+
+        <!-- The initial offset relative to the view width -->
+        <attr name="offset" />
+
+        <!-- The scrolling speed -->
+        <attr name="speed" />
+
+        <!-- Repeat the number -->
+        <attr name="marqueeRepeatLimit" />
+
+        <attr name="fadingEdge" />
+
+        <attr name="backgroundColor" />
     </declare-styleable>
 </resources>

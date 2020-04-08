@@ -6,15 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
@@ -28,7 +27,7 @@ import androidx.annotation.Px;
  * <p>
  * Scrolling marquee
  */
-public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
+public class MarqueeTextureView extends TextureView implements TextureView.SurfaceTextureListener {
 
     public static float Slow = 2f;
     public static float Middle = 3f;
@@ -160,35 +159,35 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         void onClick(int position);
     }
 
-    public MarqueeView(Context context) {
+    public MarqueeTextureView(Context context) {
         super(context);
         init(true);
     }
 
-    public MarqueeView(Context context, AttributeSet attrs) {
+    public MarqueeTextureView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.MarqueeView);
-        textSize = arr.getDimension(R.styleable.MarqueeView_textSize, TypedValue.applyDimension(
+        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.MarqueeTextureView);
+        textSize = arr.getDimension(R.styleable.MarqueeTextureView_textSize, TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP,
                 14f,
                 getResources().getDisplayMetrics()
         ));
-        textColor = arr.getColor(R.styleable.MarqueeView_textColor, Color.WHITE);
-        speed = arr.getFloat(R.styleable.MarqueeView_speed, Middle);
+        textColor = arr.getColor(R.styleable.MarqueeTextureView_textColor, Color.WHITE);
+        speed = arr.getFloat(R.styleable.MarqueeTextureView_speed, Middle);
         marqueeRepeatLimit = arr.getInt(
-                R.styleable.MarqueeView_marqueeRepeatLimit,
-                MarqueeView.MarqueeForever
+                R.styleable.MarqueeTextureView_marqueeRepeatLimit,
+                MarqueeTextureView.MarqueeForever
         );
-        CharSequence[] array = arr.getTextArray(R.styleable.MarqueeView_entries);
+        CharSequence[] array = arr.getTextArray(R.styleable.MarqueeTextureView_entries);
         if (array != null && array.length > 0) {
             entries = new String[array.length];
             for (int i = 0; i < array.length; i++) {
                 entries[i] = array[i].toString();
             }
         }
-        offset = arr.getFloat(R.styleable.MarqueeView_offset, 1f);
-        fadingEdge = arr.getBoolean(R.styleable.MarqueeView_fadingEdge, true);
-        backgroundColor = arr.getColor(R.styleable.MarqueeView_backgroundColor, Color.TRANSPARENT);
+        offset = arr.getFloat(R.styleable.MarqueeTextureView_offset, 1f);
+        fadingEdge = arr.getBoolean(R.styleable.MarqueeTextureView_fadingEdge, true);
+        backgroundColor = arr.getColor(R.styleable.MarqueeTextureView_backgroundColor, Color.TRANSPARENT);
         arr.recycle();
         init(false);
     }
@@ -211,18 +210,24 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         start();
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
         stop();
+        return true;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
     }
 
     @Override
@@ -254,7 +259,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             );
             textColor = Color.WHITE;
             speed = Middle;
-            marqueeRepeatLimit = MarqueeView.MarqueeForever;
+            marqueeRepeatLimit = MarqueeTextureView.MarqueeForever;
             offset = 1f;
             fadingEdge = true;
             backgroundColor = Color.TRANSPARENT;
@@ -263,9 +268,8 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setAntiAlias(true);
         paint.setTextSize(textSize);
         paint.setColor(textColor);
-        getHolder().addCallback(this);
-        getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        setZOrderOnTop(true);
+        setOpaque(false);
+        setSurfaceTextureListener(this);
     }
 
     private RectF getDrawRectF() {
@@ -297,17 +301,17 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     private void draw(String text, float x, float y) {
         if (!isRunning) return;
-        Canvas canvas = getHolder().lockCanvas();
+        Canvas canvas = lockCanvas();
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         canvas.drawColor(backgroundColor);
         canvas.clipRect(getDrawRectF());
         canvas.drawText(text, x + getPaddingStart(), y + getPaddingTop(), paint);
-        getHolder().unlockCanvasAndPost(canvas);
+        unlockCanvasAndPost(canvas);
     }
 
     public void start() {
-        if (!getHolder().getSurface().isValid()) return;
+        if (getSurfaceTexture() == null) return;
         if (thread != null && thread.isAlive()) {
             isRunning = false;
             try {
@@ -369,7 +373,20 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
                 }
                 String text = entries[position];
                 draw(text, x, baseline);
-                x -= speed;
+                x -= 1f;
+                long sleepMs = (long) (15 / speed);
+                if (sleepMs < 1) {
+                    sleepMs = 1;
+                }
+                // Expect a minimum of 60 frames
+                else if (sleepMs > 16) {
+                    sleepMs = 16;
+                }
+                try {
+                    Thread.sleep(sleepMs);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };
