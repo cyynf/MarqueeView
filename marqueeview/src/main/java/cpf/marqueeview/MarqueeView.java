@@ -37,7 +37,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     private float textSize;
 
-    private  int textColor;
+    private int textColor;
 
     /**
      * Scrolling speed
@@ -223,6 +223,9 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (onItemClickListener != null && position >= 0) {
             onItemClickListener.onClick(position);
+        }
+        if (isClickable()) {
+            return true;
         }
         return super.dispatchTouchEvent(event);
     }
