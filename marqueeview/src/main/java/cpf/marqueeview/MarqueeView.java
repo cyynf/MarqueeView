@@ -222,7 +222,10 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (onItemClickListener != null && position >= 0) {
-            onItemClickListener.onClick(position);
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                onItemClickListener.onClick(position);
+            }
+            return true;
         }
         if (isClickable()) {
             return true;
