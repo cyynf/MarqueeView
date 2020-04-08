@@ -11,6 +11,21 @@ Scrolling marquee
 ![image](https://github.com/cyynf/MarqueeView/blob/master/image.gif)
 
 ## Usage
+
+Add it in your root build.gradle at the end of repositories:
+``` groovy
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+}
+```
+Add the dependency
+``` groovy
+	implementation 'com.github.cyynf:MarqueeView:1.0'
+```
+Xml
 ``` xml
 <cpf.marqueeview.MarqueeView
         android:id="@+id/marquee_view"
