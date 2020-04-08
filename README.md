@@ -23,7 +23,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:1.2'
+	implementation 'com.github.cyynf:MarqueeView:1.2.1'
 ```
 Xml
 ``` xml
