@@ -305,7 +305,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void draw(String text, float x, float y) {
-        if (!isRunning) return;
+        if (!isRunning || isPause) return;
         Canvas canvas = getHolder().lockCanvas();
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
@@ -403,6 +403,11 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
                 String text = entries[position];
                 draw(text, x, baseline);
                 x -= speed;
+                try {
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     };

@@ -310,7 +310,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
     }
 
     private void draw(String text, float x, float y) {
-        if (!isRunning) return;
+        if (!isRunning || isPause) return;
         Canvas canvas = lockCanvas();
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
@@ -408,10 +408,10 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
                 }
                 String text = entries[position];
                 draw(text, x, baseline);
-                x -= 1f;
-                long sleepMs = (long) (15 / speed);
-                if (sleepMs < 2) {
-                    sleepMs = 2;
+                x -= 2f;
+                long sleepMs = (long) (30 / speed);
+                if (sleepMs < 5) {
+                    sleepMs = 5;
                 }
                 // Expect a minimum of 60 frames
                 else if (sleepMs > 16) {
