@@ -64,7 +64,9 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
 
     private String[] entries;
 
-    private boolean isRunning;
+    private boolean isRunning = true;
+
+    private boolean isPause = false;
 
     private Paint paint;
 
@@ -126,10 +128,6 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         return position;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
     public OnItemClickListener getOnItemClickListener() {
         return onItemClickListener;
     }
@@ -144,6 +142,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
 
     public void setText(String... text) {
         entries = text;
+        start();
     }
 
     public int getBackgroundColor() {
@@ -211,7 +210,10 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        start();
+        resume();
+        if (isRunning) {
+            start();
+        }
     }
 
     @Override
@@ -221,7 +223,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        stop();
+        pause();
         return true;
     }
 
@@ -233,7 +235,15 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        setVisibility(visibility);
+        if (visibility == View.GONE || visibility == View.INVISIBLE) {
+            pause();
+            clear(false);
+        } else {
+            resume();
+            if (isRunning) {
+                start();
+            }
+        }
     }
 
     @Override
@@ -310,16 +320,19 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         unlockCanvasAndPost(canvas);
     }
 
+    private void clear(boolean onlyText) {
+        Canvas canvas = lockCanvas();
+        if (canvas == null) return;
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        if (onlyText) {
+            canvas.drawColor(backgroundColor);
+        }
+        unlockCanvasAndPost(canvas);
+    }
+
     public void start() {
         if (getSurfaceTexture() == null) return;
-        if (thread != null && thread.isAlive()) {
-            isRunning = false;
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        stop();
         if (entries != null && entries.length != 0) {
             isRunning = true;
             thread = new Thread(drawTask);
@@ -332,6 +345,28 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
 
     public void stop() {
         isRunning = false;
+        if (thread != null && thread.isAlive()) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void resume() {
+        isPause = false;
+        clear(true);
+    }
+
+    private void pause() {
+        isPause = true;
+        if (thread != null && thread.isAlive()) {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 
     private Runnable drawTask = new Runnable() {
@@ -359,7 +394,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
             }
             setFadingEdge();
             float x = offset * mWidth;
-            while (isRunning) {
+            while (isRunning && !isPause) {
                 float textWidth = textWidthArray[position];
                 if (x < 0 - textWidth) {
                     x = mWidth;
@@ -375,8 +410,8 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
                 draw(text, x, baseline);
                 x -= 1f;
                 long sleepMs = (long) (15 / speed);
-                if (sleepMs < 1) {
-                    sleepMs = 1;
+                if (sleepMs < 2) {
+                    sleepMs = 2;
                 }
                 // Expect a minimum of 60 frames
                 else if (sleepMs > 16) {

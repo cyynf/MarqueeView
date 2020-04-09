@@ -65,7 +65,9 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     private String[] entries;
 
-    private boolean isRunning;
+    private boolean isRunning = true;
+
+    private boolean isPause = false;
 
     private Paint paint;
 
@@ -127,10 +129,6 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         return position;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
     public OnItemClickListener getOnItemClickListener() {
         return onItemClickListener;
     }
@@ -145,6 +143,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void setText(String... text) {
         entries = text;
+        start();
     }
 
     public int getBackgroundColor() {
@@ -167,28 +166,28 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     public MarqueeView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.MarqueeView);
-        textSize = arr.getDimension(R.styleable.MarqueeView_textSize, TypedValue.applyDimension(
+        TypedArray arr = context.obtainStyledAttributes(attrs, cpf.marqueeview.R.styleable.MarqueeView);
+        textSize = arr.getDimension(cpf.marqueeview.R.styleable.MarqueeView_textSize, TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP,
                 14f,
                 getResources().getDisplayMetrics()
         ));
-        textColor = arr.getColor(R.styleable.MarqueeView_textColor, Color.WHITE);
-        speed = arr.getFloat(R.styleable.MarqueeView_speed, Middle);
+        textColor = arr.getColor(cpf.marqueeview.R.styleable.MarqueeView_textColor, Color.WHITE);
+        speed = arr.getFloat(cpf.marqueeview.R.styleable.MarqueeView_speed, Middle);
         marqueeRepeatLimit = arr.getInt(
-                R.styleable.MarqueeView_marqueeRepeatLimit,
-                MarqueeView.MarqueeForever
+                cpf.marqueeview.R.styleable.MarqueeView_marqueeRepeatLimit,
+                cpf.marqueeview.MarqueeView.MarqueeForever
         );
-        CharSequence[] array = arr.getTextArray(R.styleable.MarqueeView_entries);
+        CharSequence[] array = arr.getTextArray(cpf.marqueeview.R.styleable.MarqueeView_entries);
         if (array != null && array.length > 0) {
             entries = new String[array.length];
             for (int i = 0; i < array.length; i++) {
                 entries[i] = array[i].toString();
             }
         }
-        offset = arr.getFloat(R.styleable.MarqueeView_offset, 1f);
-        fadingEdge = arr.getBoolean(R.styleable.MarqueeView_fadingEdge, true);
-        backgroundColor = arr.getColor(R.styleable.MarqueeView_backgroundColor, Color.TRANSPARENT);
+        offset = arr.getFloat(cpf.marqueeview.R.styleable.MarqueeView_offset, 1f);
+        fadingEdge = arr.getBoolean(cpf.marqueeview.R.styleable.MarqueeView_fadingEdge, true);
+        backgroundColor = arr.getColor(cpf.marqueeview.R.styleable.MarqueeView_backgroundColor, Color.TRANSPARENT);
         arr.recycle();
         init(false);
     }
@@ -212,7 +211,10 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        start();
+        resume();
+        if (isRunning) {
+            start();
+        }
     }
 
     @Override
@@ -222,13 +224,17 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        stop();
+        pause();
     }
 
     @Override
     protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        setVisibility(visibility);
+        if (visibility == View.GONE || visibility == View.INVISIBLE) {
+            clear(false);
+        } else {
+            clear(true);
+        }
     }
 
     @Override
@@ -240,6 +246,9 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             return true;
         }
         if (isClickable()) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                callOnClick();
+            }
             return true;
         }
         return super.dispatchTouchEvent(event);
@@ -254,7 +263,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             );
             textColor = Color.WHITE;
             speed = Middle;
-            marqueeRepeatLimit = MarqueeView.MarqueeForever;
+            marqueeRepeatLimit = cpf.marqueeview.MarqueeView.MarqueeForever;
             offset = 1f;
             fadingEdge = true;
             backgroundColor = Color.TRANSPARENT;
@@ -306,16 +315,19 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().unlockCanvasAndPost(canvas);
     }
 
+    private void clear(boolean onlyText) {
+        Canvas canvas = getHolder().lockCanvas();
+        if (canvas == null) return;
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        if (onlyText) {
+            canvas.drawColor(backgroundColor);
+        }
+        getHolder().unlockCanvasAndPost(canvas);
+    }
+
     public void start() {
         if (!getHolder().getSurface().isValid()) return;
-        if (thread != null && thread.isAlive()) {
-            isRunning = false;
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        stop();
         if (entries != null && entries.length != 0) {
             isRunning = true;
             thread = new Thread(drawTask);
@@ -328,6 +340,27 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void stop() {
         isRunning = false;
+        if (thread != null && thread.isAlive()) {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
+    private void resume() {
+        isPause = false;
+        clear(true);
+    }
+
+    private void pause() {
+        isPause = true;
+        if (thread != null && thread.isAlive()) {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 
     private Runnable drawTask = new Runnable() {
@@ -355,7 +388,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             }
             setFadingEdge();
             float x = offset * mWidth;
-            while (isRunning) {
+            while (isRunning && !isPause) {
                 float textWidth = textWidthArray[position];
                 if (x < 0 - textWidth) {
                     x = mWidth;
