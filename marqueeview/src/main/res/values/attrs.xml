@@ -17,6 +17,8 @@
         <enum name="fast" value="4" />
     </attr>
 
+    <attr name="fps" format="integer"/>
+
     <!-- Repeat the number -->
     <attr name="marqueeRepeatLimit" format="integer">
         <enum name="marquee_forever" value="-1" />
@@ -45,6 +47,8 @@
         <attr name="fadingEdge" />
 
         <attr name="backgroundColor" />
+
+        <attr name="fps"/>
     </declare-styleable>
 
     <declare-styleable name="MarqueeTextureView">
@@ -66,5 +70,7 @@
         <attr name="fadingEdge" />
 
         <attr name="backgroundColor" />
+
+        <attr name="fps"/>
     </declare-styleable>
 </resources>

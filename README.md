@@ -2,12 +2,13 @@
 Scrolling marquee
 
 ## Features
-- Supports multiple Marquee loops to scroll
+- Support multiple Marquee loops to scroll
 - Use the SurfaceView for better performance
 - Support TextureView
 - Support to set the number of repeats
 - Support FadingEdge
-- Supports set initial offset ratio
+- Support set initial offset ratio
+- Support FPS setting
 
 ![image](https://github.com/cyynf/MarqueeView/blob/master/image.gif)
 
@@ -24,7 +25,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:1.4.1'
+	implementation 'com.github.cyynf:MarqueeView:1.5'
 ```
 Use SurfaceView
 ``` xml
@@ -61,6 +62,7 @@ Use TextureView
 | speed                   | The scrolling speed, suggest: [slow,middle,fast], range: (0,10] | 
 | marqueeRepeatLimit      | Repeat the number |
 | fadingEdge              | Marquee edge fade in and out |
+| fps                     | Frames per second rate，default: 60 |
 
 ## API
 

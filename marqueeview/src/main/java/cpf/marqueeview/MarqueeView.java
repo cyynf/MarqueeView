@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -55,6 +56,8 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
      * The content is initially displayed relative to the view width offset
      */
     private float offset;
+
+    private int fps, maxFps;
 
     private boolean fadingEdge;
 
@@ -150,6 +153,19 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         return backgroundColor;
     }
 
+    public void setFps(int fps) {
+        if (fps < 30) {
+            fps = 30;
+        } else if (fps > maxFps) {
+            fps = maxFps;
+        }
+        this.fps = fps;
+    }
+
+    public int getFps() {
+        return fps;
+    }
+
     @Override
     public void setBackgroundColor(@ColorInt int backgroundColor) {
         this.backgroundColor = backgroundColor;
@@ -188,6 +204,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         offset = arr.getFloat(cpf.marqueeview.R.styleable.MarqueeView_offset, 1f);
         fadingEdge = arr.getBoolean(cpf.marqueeview.R.styleable.MarqueeView_fadingEdge, true);
         backgroundColor = arr.getColor(cpf.marqueeview.R.styleable.MarqueeView_backgroundColor, Color.TRANSPARENT);
+        fps = arr.getInt(R.styleable.MarqueeView_fps, 60);
         arr.recycle();
         init(false);
     }
@@ -267,6 +284,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             offset = 1f;
             fadingEdge = true;
             backgroundColor = Color.TRANSPARENT;
+            fps = 60;
         }
         paint = new Paint();
         paint.setAntiAlias(true);
@@ -275,6 +293,13 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
         setZOrderOnTop(true);
+        WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        maxFps = (int) (windowManager != null ? windowManager.getDefaultDisplay().getRefreshRate() : 60);
+        if (fps < 30) {
+            fps = 30;
+        } else if (fps > maxFps) {
+            fps = maxFps;
+        }
     }
 
     private RectF getDrawRectF() {
@@ -388,6 +413,8 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             }
             setFadingEdge();
             float x = offset * mWidth;
+            long lastTime = System.currentTimeMillis();
+            long targetTs = 1000 / fps;
             while (isRunning && !isPause) {
                 float textWidth = textWidthArray[position];
                 if (x < 0 - textWidth) {
@@ -403,11 +430,14 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
                 String text = entries[position];
                 draw(text, x, baseline);
                 x -= speed;
-                try {
-                    Thread.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                long sleepMs = (targetTs - System.currentTimeMillis() + lastTime) / 2;
+                if (sleepMs > 0) {
+                    try {
+                        Thread.sleep(sleepMs);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
+                lastTime = System.currentTimeMillis();
             }
         }
     };

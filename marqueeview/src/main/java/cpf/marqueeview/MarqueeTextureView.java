@@ -55,6 +55,8 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
      */
     private float offset;
 
+    private int fps;
+
     private boolean fadingEdge;
 
     /**
@@ -154,6 +156,19 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         this.backgroundColor = backgroundColor;
     }
 
+    public void setFps(int fps) {
+        if (fps < 30) {
+            fps = 30;
+        } else if (fps > 120) {
+            fps = 120;
+        }
+        this.fps = fps;
+    }
+
+    public int getFps() {
+        return fps;
+    }
+
     public interface OnItemClickListener {
         void onClick(int position);
     }
@@ -187,6 +202,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         offset = arr.getFloat(R.styleable.MarqueeTextureView_offset, 1f);
         fadingEdge = arr.getBoolean(R.styleable.MarqueeTextureView_fadingEdge, true);
         backgroundColor = arr.getColor(R.styleable.MarqueeTextureView_backgroundColor, Color.TRANSPARENT);
+        fps = arr.getInt(R.styleable.MarqueeTextureView_fps, 60);
         arr.recycle();
         init(false);
     }
@@ -273,6 +289,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
             offset = 1f;
             fadingEdge = true;
             backgroundColor = Color.TRANSPARENT;
+            fps = 60;
         }
         paint = new Paint();
         paint.setAntiAlias(true);
@@ -280,6 +297,11 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         paint.setColor(textColor);
         setOpaque(false);
         setSurfaceTextureListener(this);
+        if (fps < 30) {
+            fps = 30;
+        } else if (fps > 120) {
+            fps = 120;
+        }
     }
 
     private RectF getDrawRectF() {
@@ -394,6 +416,8 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
             }
             setFadingEdge();
             float x = offset * mWidth;
+            long lastTime = System.currentTimeMillis();
+            long targetTs = 1000 / fps;
             while (isRunning && !isPause) {
                 float textWidth = textWidthArray[position];
                 if (x < 0 - textWidth) {
@@ -408,20 +432,15 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
                 }
                 String text = entries[position];
                 draw(text, x, baseline);
-                x -= 2f;
-                long sleepMs = (long) (30 / speed);
-                if (sleepMs < 5) {
-                    sleepMs = 5;
+                x -= speed * (60f / fps);
+                long sleepMs = targetTs - System.currentTimeMillis() + lastTime;
+                if (sleepMs > 0) {
+                    try {
+                        Thread.sleep(sleepMs);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
-                // Expect a minimum of 60 frames
-                else if (sleepMs > 16) {
-                    sleepMs = 16;
-                }
-                try {
-                    Thread.sleep(sleepMs);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                lastTime = System.currentTimeMillis();
             }
         }
     };
