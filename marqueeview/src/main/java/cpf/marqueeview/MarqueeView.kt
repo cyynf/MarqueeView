@@ -153,7 +153,7 @@ class MarqueeView : View, CoroutineScope {
 
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
-        when(visibility){
+        when (visibility) {
             VISIBLE -> start()
             else -> stop()
         }
@@ -251,12 +251,14 @@ class MarqueeView : View, CoroutineScope {
     }
 
     fun start() {
+        if (!isPause) return
         stop()
         isPause = false
         drawTask()
     }
 
     fun stop() {
+        if (isPause) return
         isPause = true
         runBlocking {
             joinAll()
