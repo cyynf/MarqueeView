@@ -340,7 +340,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().unlockCanvasAndPost(canvas);
     }
 
-    private void clear(boolean onlyText) {
+    public void clear(boolean onlyText) {
         Canvas canvas = getHolder().lockCanvas();
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);

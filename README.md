@@ -25,7 +25,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:1.5'
+	implementation 'com.github.cyynf:MarqueeView:1.5.2'
 ```
 Use SurfaceView
 ``` xml
@@ -70,5 +70,6 @@ Use TextureView
 |:---				        |:---| 
 | start()                   | Start rolling, It needs to be called after modifying some Attribute | 
 | stop()                    | Stop rolling | 
+| clear()                   | clear frame | 
 | setText()                 | Set Marquee array | 
 | setOnItemClickListener()  | Marquee item click event | 
