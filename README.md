@@ -3,12 +3,9 @@ Scrolling marquee
 
 ## Features
 - Support multiple Marquee loops to scroll
-- Use the SurfaceView for better performance
-- Support TextureView
 - Support to set the number of repeats
 - Support FadingEdge
 - Support set initial offset ratio
-- Support FPS setting
 
 ![image](https://github.com/cyynf/MarqueeView/blob/master/image.gif)
 
@@ -25,7 +22,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:1.5.2'
+	implementation 'com.github.cyynf:MarqueeView:2.0.0'
 ```
 Use SurfaceView
 ``` xml
@@ -33,18 +30,6 @@ Use SurfaceView
         android:id="@+id/marquee_view"
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        app:backgroundColor="@android:color/darker_gray"
-        app:entries="@array/data"
-        app:textColor="@android:color/white"
-        app:textSize="16sp" />
-```
-Use TextureView
-``` xml
-<cpf.marqueeview.MarqueeTextureView
-        android:id="@+id/marquee_view"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        app:backgroundColor="@android:color/darker_gray"
         app:entries="@array/data"
         app:textColor="@android:color/white"
         app:textSize="16sp" />
@@ -56,13 +41,11 @@ Use TextureView
 |:---				      |:---| 
 | textSize                | Text size | 
 | textColor               | Text color | 
-| backgroundColor         | Background color |
 | entries                 | Marquee array | 
 | offset                  | The initial offset relative to the view width, range: [0,1] | 
 | speed                   | The scrolling speed, suggest: [slow,middle,fast], range: (0,10] | 
 | marqueeRepeatLimit      | Repeat the number |
 | fadingEdge              | Marquee edge fade in and out |
-| fps                     | Frames per second rate，default: 60 |
 
 ## API
 
@@ -70,6 +53,5 @@ Use TextureView
 |:---				        |:---| 
 | start()                   | Start rolling, It needs to be called after modifying some Attribute | 
 | stop()                    | Stop rolling | 
-| clear()                   | clear frame | 
 | setText()                 | Set Marquee array | 
 | setOnItemClickListener()  | Marquee item click event | 
