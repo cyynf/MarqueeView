@@ -201,7 +201,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
         }
         offset = arr.getFloat(R.styleable.MarqueeTextureView_offset, 1f);
         fadingEdge = arr.getBoolean(R.styleable.MarqueeTextureView_fadingEdge, true);
-        backgroundColor = arr.getColor(R.styleable.MarqueeTextureView_backgroundColor, Color.TRANSPARENT);
+        backgroundColor = arr.getColor(R.styleable.MarqueeTextureView_backgroundColor, Color.BLACK);
         fps = arr.getInt(R.styleable.MarqueeTextureView_fps, 60);
         arr.recycle();
         init(false);
@@ -288,7 +288,7 @@ public class MarqueeTextureView extends TextureView implements TextureView.Surfa
             marqueeRepeatLimit = MarqueeTextureView.MarqueeForever;
             offset = 1f;
             fadingEdge = true;
-            backgroundColor = Color.TRANSPARENT;
+            backgroundColor = Color.BLACK;
             fps = 60;
         }
         paint = new Paint();

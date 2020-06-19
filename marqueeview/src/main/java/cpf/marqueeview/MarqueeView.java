@@ -203,7 +203,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
         }
         offset = arr.getFloat(cpf.marqueeview.R.styleable.MarqueeView_offset, 1f);
         fadingEdge = arr.getBoolean(cpf.marqueeview.R.styleable.MarqueeView_fadingEdge, true);
-        backgroundColor = arr.getColor(cpf.marqueeview.R.styleable.MarqueeView_backgroundColor, Color.TRANSPARENT);
+        backgroundColor = arr.getColor(cpf.marqueeview.R.styleable.MarqueeView_backgroundColor, Color.BLACK);
         fps = arr.getInt(R.styleable.MarqueeView_fps, 60);
         arr.recycle();
         init(false);
@@ -283,7 +283,7 @@ public class MarqueeView extends SurfaceView implements SurfaceHolder.Callback {
             marqueeRepeatLimit = cpf.marqueeview.MarqueeView.MarqueeForever;
             offset = 1f;
             fadingEdge = true;
-            backgroundColor = Color.TRANSPARENT;
+            backgroundColor = Color.BLACK;
             fps = 60;
         }
         paint = new Paint();
