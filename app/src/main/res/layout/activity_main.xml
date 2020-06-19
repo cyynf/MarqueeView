@@ -11,7 +11,7 @@
         android:id="@+id/marquee_view"
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        app:backgroundColor="@android:color/black"
+        android:background="@android:color/black"
         app:textColor="@android:color/holo_red_light"
         app:textSize="16sp" />
 
@@ -49,55 +49,6 @@
 
         <Button
             android:id="@+id/marquee_view_stop"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="stop" />
-
-    </LinearLayout>
-
-    <cpf.marqueeview.MarqueeTextureView
-        android:id="@+id/marquee_texture_view"
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        app:backgroundColor="@android:color/black"
-        app:textColor="@android:color/holo_red_light"
-        app:textSize="16sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/marquee_texture_view_show"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="visible" />
-
-        <Button
-            android:id="@+id/marquee_texture_view_hide"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="invisible" />
-
-        <Button
-            android:id="@+id/marquee_texture_view_gone"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="gone" />
-
-        <Button
-            android:id="@+id/marquee_texture_view_start"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="start" />
-
-        <Button
-            android:id="@+id/marquee_texture_view_stop"
             style="@style/Widget.AppCompat.Button.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
