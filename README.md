@@ -3,6 +3,7 @@ Scrolling marquee
 
 ## Features
 - Support multiple Marquee loops to scroll
+- Use the SurfaceView for better performance
 - Support to set the number of repeats
 - Support FadingEdge
 - Support set initial offset ratio
@@ -22,7 +23,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:2.0.1'
+	implementation 'com.github.cyynf:MarqueeView:2.1.1'
 ```
 Use SurfaceView
 ``` xml
@@ -43,7 +44,7 @@ Use SurfaceView
 | textColor               | Text color | 
 | entries                 | Marquee array | 
 | offset                  | The initial offset relative to the view width, range: [0,1] | 
-| speed                   | The scrolling speed, suggest: [slow,middle,fast], range: (0,10] | 
+| speed                   | The scrolling speed, suggest: [slow,middle,fast], range: [0,1] | 
 | marqueeRepeatLimit      | Repeat the number |
 | fadingEdge              | Marquee edge fade in and out |
 

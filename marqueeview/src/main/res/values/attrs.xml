@@ -11,16 +11,14 @@
     <attr name="offset" format="float" />
 
     <!-- The scrolling speed -->
-    <attr name="speed" format="float">
-        <enum name="slow" value="1" />
-        <enum name="middle" value="2" />
-        <enum name="fast" value="3" />
-    </attr>
+    <attr name="speed" format="float" />
 
     <!-- Repeat the number -->
     <attr name="marqueeRepeatLimit" format="integer">
         <enum name="marquee_forever" value="-1" />
     </attr>
+
+    <attr name="backgroundColor" format="color" />
 
     <attr name="fadingEdge" format="boolean" />
 
@@ -41,6 +39,28 @@
         <attr name="marqueeRepeatLimit" />
 
         <attr name="fadingEdge" />
+
+    </declare-styleable>
+
+    <declare-styleable name="MarqueeSurfaceView">
+        <attr name="textSize" />
+        <attr name="textColor" />
+
+        <!-- string-array in an XML tag -->
+        <attr name="entries" />
+
+        <!-- The initial offset relative to the view width -->
+        <attr name="offset" />
+
+        <!-- The scrolling speed -->
+        <attr name="speed" />
+
+        <!-- Repeat the number -->
+        <attr name="marqueeRepeatLimit" />
+
+        <attr name="fadingEdge" />
+
+        <attr name="backgroundColor" />
 
     </declare-styleable>
 

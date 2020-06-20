@@ -7,11 +7,15 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <cpf.marqueeview.MarqueeView
+    <cpf.marqueeview.MarqueeSurfaceView
         android:id="@+id/marquee_view"
         android:layout_width="match_parent"
         android:layout_height="44dp"
-        android:background="@android:color/black"
+        app:backgroundColor="@android:color/black"
+        app:entries="@array/data"
+        app:fadingEdge="true"
+        app:offset="1"
+        app:speed="0.5"
         app:textColor="@android:color/holo_red_light"
         app:textSize="16sp" />
 
@@ -55,5 +59,17 @@
             android:text="stop" />
 
     </LinearLayout>
+
+    <cpf.marqueeview.MarqueeView
+        android:id="@+id/marquee"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@android:color/black"
+        app:entries="@array/data"
+        app:fadingEdge="true"
+        app:offset="1"
+        app:speed="0.5"
+        app:textColor="@android:color/holo_red_light"
+        app:textSize="16sp" />
 
 </LinearLayout>

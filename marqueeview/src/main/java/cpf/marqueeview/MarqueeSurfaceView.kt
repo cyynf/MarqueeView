@@ -5,13 +5,12 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.FloatRange
 import androidx.annotation.Px
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.*
 
 /**
@@ -22,7 +21,7 @@ import kotlinx.coroutines.*
  *
  * Scrolling marquee
  */
-class MarqueeView : View {
+class MarqueeSurfaceView : SurfaceView, SurfaceHolder.Callback {
     @Px
     var textSize = 0f
         set(value) {
@@ -34,6 +33,15 @@ class MarqueeView : View {
     var textColor = 0
         set(value) {
             paint.color = textColor
+            field = value
+        }
+
+    @ColorInt
+    var bgColor = 0
+        set(value) {
+            if (Color.alpha(value) != 255) {
+                throw Exception("BackgroundColor cannot contain alpha")
+            }
             field = value
         }
 
@@ -105,38 +113,29 @@ class MarqueeView : View {
         init(true)
     }
 
-    constructor(
-        context: Context,
-        attrs: AttributeSet?
-    ) : super(context, attrs) {
-        val arr =
-            context.obtainStyledAttributes(attrs, R.styleable.MarqueeView)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        val arr = context.obtainStyledAttributes(attrs, R.styleable.MarqueeSurfaceView)
         textSize = arr.getDimension(
-            R.styleable.MarqueeView_textSize, TypedValue.applyDimension(
+            R.styleable.MarqueeSurfaceView_textSize, TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP,
                 14f,
                 resources.displayMetrics
             )
         )
-        textColor = arr.getColor(
-            R.styleable.MarqueeView_textColor,
-            Color.WHITE
-        )
-        speed = arr.getFloat(
-            R.styleable.MarqueeView_speed,
-            Middle
-        )
-        marqueeRepeatLimit = arr.getInt(
-            R.styleable.MarqueeView_marqueeRepeatLimit,
-            MarqueeForever
-        )
-        val array =
-            arr.getTextArray(R.styleable.MarqueeView_entries)
+        textColor = arr.getColor(R.styleable.MarqueeSurfaceView_textColor, Color.WHITE)
+        speed = arr.getFloat(R.styleable.MarqueeSurfaceView_speed, Middle)
+        marqueeRepeatLimit =
+            arr.getInt(R.styleable.MarqueeSurfaceView_marqueeRepeatLimit, MarqueeForever)
+        val array = arr.getTextArray(R.styleable.MarqueeSurfaceView_entries)
         if (array != null && array.isNotEmpty()) {
             entries.addAll(array.toList().map { it.toString() })
         }
-        offset = arr.getFloat(R.styleable.MarqueeView_offset, 1f)
-        isFadingEdge = arr.getBoolean(R.styleable.MarqueeView_fadingEdge, true)
+        offset = arr.getFloat(R.styleable.MarqueeSurfaceView_offset, 1f)
+        isFadingEdge = arr.getBoolean(R.styleable.MarqueeSurfaceView_fadingEdge, true)
+        bgColor = arr.getColor(
+            R.styleable.MarqueeSurfaceView_backgroundColor,
+            Color.BLACK
+        )
         arr.recycle()
         init(false)
     }
@@ -156,6 +155,22 @@ class MarqueeView : View {
         } else {
             setMeasuredDimension(specWidthSize, specHeightSize)
         }
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        start()
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        stop()
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        setVisibility(visibility)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -186,12 +201,13 @@ class MarqueeView : View {
             marqueeRepeatLimit = MarqueeForever
             offset = 1f
             isFadingEdge = true
+            bgColor = Color.BLACK
         }
         paint.textSize = textSize
         paint.color = textColor
-        if (entries.isNotEmpty()) {
-            start()
-        }
+        holder.addCallback(this)
+        holder.setFormat(PixelFormat.TRANSLUCENT)
+        setZOrderOnTop(true)
     }
 
     private val drawRectF: RectF
@@ -225,31 +241,14 @@ class MarqueeView : View {
         }
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    private fun draw() {
+        if (isPause) return
+        val canvas = holder.lockCanvas() ?: return
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        canvas.drawColor(bgColor)
         canvas.clipRect(drawRectF)
         canvas.drawText(mText, mX + paddingStart, mY + paddingTop, paint)
-    }
-
-    fun bindToLifeCycle(lifecycle: Lifecycle) {
-        lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(
-                source: LifecycleOwner,
-                event: Lifecycle.Event
-            ) {
-                when (event) {
-                    Lifecycle.Event.ON_RESUME -> {
-                        start()
-                    }
-                    Lifecycle.Event.ON_PAUSE -> {
-                        stop()
-                    }
-                    Lifecycle.Event.ON_DESTROY -> lifecycle.removeObserver(this)
-                    else -> {
-                    }
-                }
-            }
-        })
+        holder.unlockCanvasAndPost(canvas)
     }
 
     @Synchronized
@@ -271,7 +270,7 @@ class MarqueeView : View {
 
     private fun drawTask() {
         job = GlobalScope.launch {
-            while (width == 0 || height == 0) {
+            while (width == 0 || height == 0 || !holder.surface.isValid) {
                 delay(16)
             }
             var repeatCount = marqueeRepeatLimit
@@ -294,7 +293,7 @@ class MarqueeView : View {
                     mX = 0f
                     mY = baseline
                     mText = text
-                    postInvalidate()
+                    draw()
                     return@launch
                 }
             }
@@ -316,9 +315,9 @@ class MarqueeView : View {
                 mX = x
                 mY = baseline
                 mText = text
-                postInvalidate()
-                x -= speed * 2
-                delay(5)
+                draw()
+                x -= speed * 5
+                delay(3)
             }
         }
     }
@@ -329,5 +328,4 @@ class MarqueeView : View {
         var Fast = 0.8f
         var MarqueeForever = -1
     }
-
 }
