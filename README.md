@@ -23,7 +23,7 @@ allprojects {
 ```
 Add the dependency
 ``` groovy
-	implementation 'com.github.cyynf:MarqueeView:2.1.1'
+	implementation 'com.github.cyynf:MarqueeView:2.1.0'
 ```
 Use SurfaceView
 ``` xml
